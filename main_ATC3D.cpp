@@ -452,13 +452,7 @@ vector<MaximalBlurredSegment3D> buildModifiedATC(vector<Z3i::Point>& aContour,
 int main(int argc, char** argv)
 {
   QApplication application(argc,argv);
-  //Illustration hdr : vasque_noise_n34
-  //seg_degen1 => nu = 1
-  //seg_degen2 => nu = 3
-  //seg_degen4 => nu = 1 : solve
-  //seg_degen3 => nu = 3 : solve
-  char fileContour[] = "../data/seg_degen2.dat";//sinus sinusModif spheric helix helixModif horopter vasque_noise
-  //char fileContour[] = "../experiments/Astroid/Noise_r2/Astroid_15_15_1_r2_noise8.dat";//sinus sinusModif spheric helix helixModif horopter vasque_noise
+  char fileContour[] = "../data/sinus_noise.dat";
   vector<Z3i::Point> aContour = PointListReader<Z3i::Point>::getPointsFromFile(fileContour);
   /*
   //Gen noise and move points
@@ -484,42 +478,20 @@ int main(int argc, char** argv)
   fileContourNoise = fileContourNoise.substr(0,fileContourNoise.size()-4)+"_noise.dat";
   writePointList(aContour,fileContourNoise.c_str());
   */
-  //aContour.push_back(aContour.front());
+  
   //Project into 2D planes
   vector<Z2i::Point> aContourXY, aContourXZ, aContourYZ;
   bool validOxy=false,validOxz=false,validOyz=false;
   bool bijective=projectionPoints3D(aContour,aContourXY,aContourXZ,aContourYZ,validOxy,validOxz,validOyz);
-  //vector<std::tuple<bool, bool, bool> > projection;
-  //bool bijective=projectionPoints3D(aContour,aContourXY,aContourXZ,aContourYZ,projection);
-  //if(bijective==false)
-  //  cout<<"not bijective projection points"<<endl;
   
   vector<double> vecMTXYtmp, vecMTXZtmp, vecMTYZtmp, vecMT;
   vecMTXYtmp=vector<double>(aContourXY.size(),3.0);//getMeaningfulThickness(aContourXY,10,1);//
   vecMTXZtmp=vector<double>(aContourXZ.size(),3.0);//getMeaningfulThickness(aContourXZ,10,1);//
   vecMTYZtmp=vector<double>(aContourYZ.size(),3.0);//getMeaningfulThickness(aContourYZ,10,1);//
-  //vecMT=getThicknessAssociation(vecMTXYtmp, vecMTXZtmp, vecMTYZtmp, &max_functor);
-  //vecMT=getThicknessAssociation(vecMTXYtmp, vecMTXZtmp, vecMTYZtmp, &min_functor);
-  //vecMT=getThicknessAssociation(vecMTXYtmp, vecMTXZtmp, vecMTYZtmp, &mean_functor);
   vecMT=getThicknessAssociation(vecMTXYtmp, vecMTXZtmp, vecMTYZtmp, &mid_functor);
   
   //Step 1: get all different noise-levels then sort them
   std::vector<double> vecNoiseLevel;
-  /*
-   vecNoiseLevel.push_back(vecMTXYtmp.front());
-   for(size_t it=1; it<vecMTXYtmp.size(); it++) {
-   if (!(std::find(vecNoiseLevel.begin(), vecNoiseLevel.end(), vecMTXYtmp.at(it)) != vecNoiseLevel.end()))
-   vecNoiseLevel.push_back(vecMTXYtmp.at(it));
-   }
-   for(size_t it=0; it<vecMTXZtmp.size(); it++) {
-   if (!(std::find(vecNoiseLevel.begin(), vecNoiseLevel.end(), vecMTXZtmp.at(it)) != vecNoiseLevel.end()))
-   vecNoiseLevel.push_back(vecMTXZtmp.at(it));
-   }
-   for(size_t it=0; it<vecMTYZtmp.size(); it++) {
-   if (!(std::find(vecNoiseLevel.begin(), vecNoiseLevel.end(), vecMTYZtmp.at(it)) != vecNoiseLevel.end()))
-   vecNoiseLevel.push_back(vecMTYZtmp.at(it));
-   }
-   */
   vecNoiseLevel.push_back(vecMT.front());
   for(size_t it=1; it<vecMT.size(); it++) {
     if (!(std::find(vecNoiseLevel.begin(), vecNoiseLevel.end(), vecMT.at(it)) != vecNoiseLevel.end()))
@@ -533,7 +505,6 @@ int main(int argc, char** argv)
   
   //Step 2: built ATC
   vector<MaximalBlurredSegment3D> ATC = buildATC(aContour, vecMT);
-  //vector<MaximalBlurredSegment3D> ATC = buildModifiedATC(aContour, vecMT);
   vector<int> color;
   vector<AlphaThickSegmentComputer3D> segATC;
   for(size_t it=0; it<ATC.size(); it++) {
@@ -549,8 +520,7 @@ int main(int argc, char** argv)
   //show 3D points
   for (size_t i =0; i< aContour.size(); i++) {
     Z3i::Point p (aContour[i][0],aContour[i][1], aContour[i][2]);
-    viewer << SetMode3D( p.className(), "Grid" );//Grid
-    //viewer << CustomColors3D(Color(0,0,250,100),Color(0,0,250,100));
+    viewer << SetMode3D( p.className(), "Grid" );//Both
     viewer << p;
   }
   viewer << CustomColors3D(Color(250,0,0,100),Color(250,0,0,100));
@@ -620,9 +590,7 @@ int main(int argc, char** argv)
         break;
     }
     viewer << segATC.at(it);
-    //viewer.addLine(p1, p2);
   }
-  //viewer << CustomColors3D( DGtal::Color::Gray, DGtal::Color::Gray );
   viewer << MyViewer::updateDisplay;
   return application.exec();
   return 0;
