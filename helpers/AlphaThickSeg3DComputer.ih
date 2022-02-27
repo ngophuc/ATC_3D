@@ -1,0 +1,641 @@
+
+///////////////////////////////////////////////////////////////////////////////
+// Implementation of inline methods                                          //
+/**
+ * Default constructor.
+ */
+template <typename TIterator, typename TInteger>
+inline
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::AlphaThickSeg3DComputer(const double maximalThickness, const int nbPlane)
+{
+  //ATS 2D
+  myMaximalThickness = maximalThickness;
+  myXYalgo = AlphaThickSegmentComputer2d(myMaximalThickness);
+  myXZalgo = AlphaThickSegmentComputer2d(myMaximalThickness);
+  myYZalgo = AlphaThickSegmentComputer2d(myMaximalThickness);
+  //projections
+  std::vector<DGtal::Dimension> v1,v2,v3;
+  v1.push_back(0);
+  v1.push_back(1);
+  v2.push_back(0);
+  v2.push_back(2);
+  v3.push_back(1);
+  v3.push_back(2);
+  myProjXY.init(v1.begin(),v1.end());
+  myProjXZ.init(v2.begin(),v2.end());
+  myProjYZ.init(v3.begin(),v3.end());
+  blockXY = blockXZ = blockYZ = false;
+  //Valid planes
+  myNbPlane = nbPlane;
+}
+
+/**
+ * Constructor with initialisation
+ */
+template <typename TIterator, typename TInteger>
+inline
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::AlphaThickSeg3DComputer(const ConstIterator& it, const double maximalThickness, const int nbPlane)
+{
+  //ATS 2D
+  myMaximalThickness = maximalThickness;
+  myXYalgo = AlphaThickSegmentComputer2d(myMaximalThickness);
+  myXZalgo = AlphaThickSegmentComputer2d(myMaximalThickness);
+  myYZalgo = AlphaThickSegmentComputer2d(myMaximalThickness);
+  //projections
+  std::vector<DGtal::Dimension> v1,v2,v3;
+  v1.push_back(0);
+  v1.push_back(1);
+  v2.push_back(0);
+  v2.push_back(2);
+  v3.push_back(1);
+  v3.push_back(2);
+  myProjXY.init(v1.begin(),v1.end());
+  myProjXZ.init(v2.begin(),v2.end());
+  myProjYZ.init(v3.begin(),v3.end());
+  //Valid planes
+  myNbPlane = nbPlane;
+  init(it);
+}
+
+/**
+ * Initialisation.
+ * @param it an iterator on a sequence of points
+ */
+template <typename TIterator, typename TInteger>
+inline
+void DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::init ( const ConstIterator& it )
+{
+  //begin and end iterators
+  myBegin = it;
+  myEnd = it;
+  myEnd++;
+  //adapters and projections
+  IteratorAdapter XYit(it,myProjXY);
+  myXYalgo.init(XYit);
+  IteratorAdapter XZit(it,myProjXZ);
+  myXZalgo.init(XZit);
+  IteratorAdapter YZit(it,myProjYZ);
+  myYZalgo.init(YZit);
+  blockXY = blockXZ = blockYZ = false;
+}
+
+/**
+ * Copy constructor.
+ * @param other the object to clone.
+ * Forbidden by default.
+ */
+template <typename TIterator, typename TInteger>
+inline
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::AlphaThickSeg3DComputer (
+                                          const AlphaThickSeg3DComputer<TIterator,TInteger> & other ) :
+  myProjXY(other.myProjXY), myProjXZ(other.myProjXZ), myProjYZ(other.myProjYZ),
+  myXYalgo(other.myXYalgo), myXZalgo(other.myXZalgo), myYZalgo(other.myYZalgo),
+  myLengthXY(other.myLengthXY), myLengthXZ(other.myLengthXZ), myLengthYZ(other.myLengthYZ),
+  myBegin(other.myBegin), myEnd(other.myEnd), myMaximalThickness(other.myMaximalThickness)
+{
+    myNbPlane = other.myNbPlane;
+    blockXY = other.blockXY;
+    blockXZ = other.blockXZ;
+    blockYZ = other.blockYZ;
+}
+
+/**
+ * Assignment.
+ * @param other the object to copy.
+ * @return a reference on 'this'.
+ * Forbidden by default.
+ */
+template <typename TIterator, typename TInteger>
+inline
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger> &
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::operator= (
+                                      const AlphaThickSeg3DComputer<TIterator,TInteger> & other )
+{
+  myProjXY = other.myProjXY;
+  myProjXZ = other.myProjXZ;
+  myProjYZ = other.myProjYZ;
+  myXYalgo = other.myXYalgo;
+  myXZalgo = other.myXZalgo;
+  myYZalgo = other.myYZalgo;
+  myBegin = other.myBegin;
+  myEnd = other.myEnd;
+  blockXY = other.blockXY;
+  blockXZ = other.blockXZ;
+  blockYZ = other.blockYZ;
+  myMaximalThickness = other.myMaximalThickness;
+  myNbPlane = other.myNbPlane;
+  myLengthXY = other.myLengthXY;
+  myLengthXZ = other.myLengthXZ;
+  myLengthYZ = other.myLengthYZ;
+  return *this;
+}
+
+template <typename TIterator, typename TInteger>
+inline
+typename DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::Self
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::getSelf() const
+{
+  return Self();
+}
+
+template <typename TIterator, typename TInteger>
+inline
+typename DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::Reverse
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::getReverse() const
+{
+  return Reverse();
+}
+
+template <typename TIterator, typename TInteger>
+inline
+bool
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::isInATS ( const Point3d & point) const
+{
+  char test = 0;
+  if ( myXYalgo.isExtendableFront ( myProjXY ( point ) ) ) test++;
+  if ( myXZalgo.isExtendableFront ( myProjXZ ( point ) ) ) test++;
+  if ( myYZalgo.isExtendableFront ( myProjYZ ( point ) ) ) test++;
+  return test >= myNbPlane ? true : false;
+}
+
+template <typename TIterator, typename TInteger>
+inline
+bool
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::isInATS ( const ConstIterator & it) const
+{
+  char test = 0;
+  if ( myXYalgo.isExtendableFront ( myProjXY ( *it ) ) ) test++;
+  if ( myXZalgo.isExtendableFront ( myProjXZ ( *it ) ) ) test++;
+  if ( myYZalgo.isExtendableFront ( myProjYZ ( *it ) ) ) test++;
+  return test >= myNbPlane ? true : false;
+}
+
+/**
+ * Equality operator.
+ * @param other the object to compare with.
+ * @return 'true' either if the points perfectly match
+ * or if the first points match to the last ones
+ * (same ATS scanned in the conversed way)
+ * and 'false' otherwise
+ */
+template <typename TIterator, typename TInteger>
+inline
+bool
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::operator==(
+                                      const AlphaThickSeg3DComputer<TIterator,TInteger>& other ) const
+{
+  return (  ( (	myXYalgo == other.myXYalgo ) &&
+            (	myXZalgo == other.myXZalgo ) &&
+            (	myYZalgo == other.myYZalgo ) ) ||
+            ( (*myBegin == *other.myBegin) &&
+            (*myEnd == *other.myEnd) ) );
+}
+
+/**
+ * Difference operator.
+ * @param other the object to compare with.
+ * @return 'false' if equal
+ * 'true' otherwise
+ */
+template <typename TIterator, typename TInteger>
+inline
+bool
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::operator!=(
+                                      const AlphaThickSeg3DComputer<TIterator,TInteger> & other ) const
+{
+  return (!(*this == other));
+}
+
+/**
+ * Tests whether the union between a point
+ * (add to the front of the ATS
+ * with respect to the scan orientation)
+ * and a ATS is a ATS.
+ * Computes the parameters of the new ATS
+ * with the added point if true.
+ * @param it an iterator on a sequence of points
+ * @return 'true' if the union is a ATS, 'false' otherwise.
+ */
+template <typename TIterator, typename TInteger>
+inline
+bool
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::extendFront()
+{
+    if ( !isExtendableFront() ) return false;
+
+    char test = 0;
+    if ( extendFront ( myXYalgo, blockXY ) ) test++;
+    if ( extendFront ( myXZalgo, blockXZ ) ) test++;
+    if ( extendFront ( myYZalgo, blockYZ ) ) test++;
+    if ( test >= myNbPlane )
+    {
+        myLengthXY = std::max(myLengthXY,((*myXYalgo.begin())-(*(myXYalgo.end()-1))).norm());
+        myLengthXZ = std::max(myLengthXZ,((*myXZalgo.begin())-(*(myXZalgo.end()-1))).norm());
+        myLengthYZ = std::max(myLengthYZ,((*myYZalgo.begin())-(*(myYZalgo.end()-1))).norm());
+        //std::cout<<"==> lenXY="<<myLengthXY<<" lenXZ="<<myLengthXZ<<" lenYZ="<<myLengthYZ<<std::endl;
+        myEnd++;
+        return true;
+    }
+    return test == 1;
+}
+
+template <typename TIterator, typename TInteger>
+inline
+bool
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::extendFront ( AlphaThickSegmentComputer2d & ATS2D, bool & blocked )
+{
+  if ( ATS2D.isExtendableFront() && !blocked)
+  {
+      ATS2D.extendFront();
+      return true;
+  }
+  else
+  {
+    blocked = true;
+    return false;
+  }
+}
+
+/** Tests whether the 3D alpha thick segment can be extended at the front.
+ *
+ * @return 'true' if yes, 'false' otherwise
+ */
+template <typename TIterator, typename TInteger>
+inline
+bool
+DGtal::AlphaThickSeg3DComputer<TIterator, TInteger>::isExtendableFront()
+{
+    /*
+    //projection on xy-plane
+    bool XYflag = myXYalgo.isExtendableFront();
+
+    //projection on xz-plane
+    bool XZflag = myXZalgo.isExtendableFront();
+
+    //projection on yz-plane
+    bool YZflag = myYZalgo.isExtendableFront();
+
+    if ( (XYflag)&&(XZflag)&&(YZflag) )
+      return true;
+    else return false;
+    */
+    int test = 0;
+    if ( myXYalgo.isExtendableFront() && !blockXY ) test++;
+    if ( myXZalgo.isExtendableFront() && !blockXZ ) test++;
+    if ( myYZalgo.isExtendableFront() && !blockYZ ) test++;
+    if ( test >= myNbPlane ) {
+        return true;
+    }
+    else return false;
+}
+
+template <typename TIterator, typename TInteger>
+inline
+TIterator
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::begin() const {
+  return myBegin;
+}
+
+template <typename TIterator, typename TInteger>
+inline
+TIterator
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::end() const {
+  return myEnd;
+}
+
+//-----------------------------------------------------------------
+/**
+ * Checks the validity/consistency of the object.
+ * @return 'true' if the object is valid, 'false' otherwise.
+ */
+
+template <typename TIterator, typename TInteger>
+inline
+bool
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::isValid() const
+{
+  return ( ( myXYalgo.isValid() ) &&
+           ( myXZalgo.isValid() ) &&
+           ( myYZalgo.isValid() ) );
+}
+
+/**
+ * Computes the parameters
+ * (direction, intercept, thickness)
+ * of the alpha thick segment
+ * @param direction
+ * @param intercept
+ * @param thickness
+ */
+template <typename TIterator, typename TInteger>
+inline
+void
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>
+::getParameters ( PointD3d& direction, PointD3d& intercept, PointD3d& thickness ) const
+{
+  double minimalThickness = 1.0;
+  
+  double lenXY = myLengthXY; //std::max(minimalThickness,((*myXYalgo.begin())-(*(myXYalgo.end()-1))).norm());
+  double lenXZ = myLengthXZ; //std::max(minimalThickness,((*myXZalgo.begin())-(*(myXZalgo.end()-1))).norm());
+  double lenYZ = myLengthYZ; //std::max(minimalThickness,((*myYZalgo.begin())-(*(myYZalgo.end()-1))).norm());
+  //std::cout<<"lenXY="<<lenXY<<" lenXZ="<<lenXZ<<" lenYZ="<<lenYZ<<std::endl;
+  //std::cout<<"myLengthXY="<<myLengthXY<<" myLengthXZ="<<myLengthXZ<<" myLengthYZ="<<myLengthYZ<<std::endl;
+  /*
+  std::cout<<"myXYalgo.getNormal="<<myXYalgo.getNormal()[0]<<","<<myXYalgo.getNormal()[1]<<std::endl;
+  std::cout<<"myXZalgo.getNormal="<<myXZalgo.getNormal()[0]<<","<<myXZalgo.getNormal()[1]<<std::endl;
+  std::cout<<"myYZalgo.getNormal="<<myYZalgo.getNormal()[0]<<","<<myYZalgo.getNormal()[1]<<std::endl;
+  std::cout<<"myXYalgo.getMu="<<myXYalgo.getMu()<<std::endl;
+  std::cout<<"myXZalgo.getMu="<<myXZalgo.getMu()<<std::endl;
+  std::cout<<"myYZalgo.getMu="<<myYZalgo.getMu()<<std::endl;
+  std::cout<<"myXYalgo.getNu="<<myXYalgo.getNu()<<std::endl;
+  std::cout<<"myXZalgo.getNu="<<myXZalgo.getNu()<<std::endl;
+  std::cout<<"myYZalgo.getNu="<<myYZalgo.getNu()<<std::endl;
+  std::cout<<"myXYalgo.isValid()="<<!blockXY<<std::endl;
+  std::cout<<"myXZalgo.isValid()="<<!blockXZ<<std::endl;
+  std::cout<<"myYZalgo.isValid()="<<!blockYZ<<std::endl;
+  */
+  int plane = -1;
+  double a1 = myXYalgo.getNormal()[1];//Integer a1 = myXYalgo.b();
+  double b1 = myXYalgo.getNormal()[0];//Integer b1 = myXYalgo.a();
+  double a2 = myXZalgo.getNormal()[1];//Integer a2 = myXZalgo.b();
+  double c1 = myXZalgo.getNormal()[0];//Integer c1 = myXZalgo.a();
+  double b2 = myYZalgo.getNormal()[1];//Integer b2 = myYZalgo.b();
+  double c2 = myYZalgo.getNormal()[0];//Integer c2 = myYZalgo.a();
+  PointD3d dxy(a1,b1,0), dxz (a2,0,c1), dyz(0,b2,c2);
+  double p0 = dxy[0]*dxz[0] + dxy[1]*dxz[1] + dxy[2]*dxz[2]; // two vectors are orthogonals, degenerate cases !
+  double p1 = dxy[0]*dyz[0] + dxy[1]*dyz[1] + dxy[2]*dyz[2];
+  double p2 = dxz[0]*dyz[0] + dxz[1]*dyz[1] + dxz[2]*dyz[2];
+      
+  if(!blockXY && !blockXZ && !blockYZ) {//three valid planes
+      if (/* a1!=0 && a2!=0 && */ lenXY >= lenYZ && lenXZ >= lenYZ )
+        plane = 0; //XY-plane, XZ-plane
+      else {
+        if (/* b1!=0 && b2!=0 && */ lenYZ >= lenXZ && lenXY >= lenXZ)
+          plane = 1; //XY-plane, YZ-plane
+        else {
+            if (/* c1!=0 && c2!=0 && */ lenYZ >= lenXY && lenXZ >= lenXY)
+            plane = 2; //YZ-plane, XZ-plane
+        }
+    }
+  }
+  else {//two valid planes
+      if (!blockXY && !blockXZ)
+        plane = 0; //XY-plane, XZ-plane
+      if(!blockXY && !blockYZ)
+        plane = 1; //XY-plane, YZ-plane
+      if(!blockYZ && !blockXZ)
+        plane = 2; //YZ-plane, XZ-plane
+  }
+
+  if(plane == 0 && p0!=0)//(!blockXY && !blockXZ)
+  { //XY-plane, XZ-plane
+    //std::cout<<"XY-plane, XZ-plane, plane="<<plane<<std::endl;
+    double a1 = -myXYalgo.getNormal()[1];//Integer a1 = myXYalgo.b();
+    double b1 = myXYalgo.getNormal()[0];//Integer b1 = myXYalgo.a();
+    double a2 = -myXZalgo.getNormal()[1];//Integer a2 = myXZalgo.b();
+    double c1 = myXZalgo.getNormal()[0];//Integer c1 = myXZalgo.a();
+    //std::cout<<"a1="<<a1<<", b1="<<b1<<", a2="<<a2<<", c1="<<c1<<std::endl;
+    if ( /* c1 == 0 || */ ( a1 == 0 && a2 == 0 ) ) {
+      direction = PointD3d ( a1, b1, c1 );
+      double mu1 = myXYalgo.getMu();//Integer mu1 = myXYalgo.mu();
+      double mu2 = myXZalgo.getMu();//Integer mu2 = myXZalgo.mu();
+      intercept[0] = 0; intercept[1] = -mu1; intercept[2] = -mu2;
+      double omega1 = std::max(minimalThickness,myXYalgo.getNu());//Integer omega1 = myXYalgo.omega()-1;
+      double omega2 = std::max(minimalThickness,myXZalgo.getNu());//Integer omega2 = myXZalgo.omega()-1;
+      thickness[0] = 0; thickness[1] = -omega1; thickness[2] = -omega2; 
+    }
+    else
+    {
+      if ( b1 == 0  )
+        direction = PointD3d ( a2, b1, c1 );
+      else
+        direction = PointD3d ( a1 * a2 , a2 * b1 , a1 * c1 );
+    
+      double mu1 = myXYalgo.getMu();//Integer mu1 = myXYalgo.mu();
+      double mu2 = myXZalgo.getMu();//Integer mu2 = myXZalgo.mu();
+      intercept[0] = 0; intercept[1] = -mu1/ a1; intercept[2] = -mu2/a2;//intercept[0] = std::make_pair ( 0, 1 ); intercept[1] = std::make_pair ( -mu1, a1 ); intercept[2] = std::make_pair ( -mu2, a2 );
+
+      double omega1 = std::max(minimalThickness,myXYalgo.getNu());//Integer omega1 = myXYalgo.omega()-1;
+      double omega2 = std::max(minimalThickness,myXZalgo.getNu());//Integer omega2 = myXZalgo.omega()-1;
+      thickness[0] = 0; thickness[1] = -omega1/a1; thickness[2] = -omega2/a2;//thickness[0] = std::make_pair ( 0, 1 ); thickness[1] = std::make_pair ( -omega1, a1 ); thickness[2] = std::make_pair ( -omega2, a2 );
+      //std::cout<<"mu1="<<mu1<<", mu2="<<mu2<<", omega1="<<omega1<<", omega2="<<omega2<<std::endl;
+      //std::cout<<"direction="<<direction<<", intercept="<<intercept<<", thickness="<<thickness<<std::endl;
+    }
+  }
+  else
+  {
+    if(plane == 1 && p1!=0)//(!blockXY && !blockYZ)
+    { //XY-plane, YZ-plane
+      //std::cout<<"XY-plane, YZ-plane, plane="<<plane<<std::endl;
+      double a1 = -myXYalgo.getNormal()[1];//Integer a1 = myXYalgo.b();
+      double b1 = myXYalgo.getNormal()[0];//Integer b1 = myXYalgo.a();
+      double b2 = -myYZalgo.getNormal()[1];//Integer b2 = myYZalgo.b();
+      double c2 = myYZalgo.getNormal()[0];//Integer c2 = myYZalgo.a();
+
+      if ( /* a1 == 0 || */ ( b2 == 0 && b1 == 0 ) ) {
+        direction = PointD3d ( a1, b2, c2 );
+        double mu1 = myXYalgo.getMu();//Integer mu1 = myXYalgo.mu();
+        double mu2 = myYZalgo.getMu();//Integer mu2 = myYZalgo.mu();
+        intercept[0] = mu1; intercept[1] = 0; intercept[2] = -mu2;
+        double omega1 = std::max(minimalThickness,myXYalgo.getNu());//Integer omega1 = myXYalgo.omega()-1;
+        double omega2 = std::max(minimalThickness,myYZalgo.getNu());//Integer omega2 = myYZalgo.omega()-1;
+        thickness[0] = omega1; thickness[1] = 0; thickness[2] = -omega2;
+      }
+      else
+      {
+        if ( c2 == 0 )
+          direction = PointD3d ( a1, b1, c2 );
+        else
+          direction = PointD3d ( b2 * a1 , b1 * b2 , b1 * c2 );
+
+        double mu1 = myXYalgo.getMu();//Integer mu1 = myXYalgo.mu();
+        double mu2 = myYZalgo.getMu();//Integer mu2 = myYZalgo.mu();
+        intercept[0] = mu1/b1; intercept[1] = 0; intercept[2] = -mu2/b2;//intercept[0] = std::make_pair ( mu1, b1 ); intercept[1] = std::make_pair ( 0, 1 ); intercept[2] = std::make_pair ( -mu2, b2 );
+
+        double omega1 = std::max(minimalThickness,myXYalgo.getNu());//Integer omega1 = myXYalgo.omega()-1;
+        double omega2 = std::max(minimalThickness,myYZalgo.getNu());//Integer omega2 = myYZalgo.omega()-1;
+        thickness[0] = omega1/b1; thickness[1] = 0; thickness[2] = -omega2/b2;//thickness[0] = std::make_pair ( omega1, b1 ); thickness[1] = std::make_pair ( 0, 1 ); thickness[2] = std::make_pair ( -omega2, b2 );
+      //std::cout<<"mu1="<<mu1<<", mu2="<<mu2<<", omega1="<<omega1<<", omega2="<<omega2<<std::endl;
+      //std::cout<<"direction="<<direction<<", intercept="<<intercept<<", thickness="<<thickness<<std::endl;
+      }
+    }
+    else
+    {
+      if(plane == 2 && p2!=0)//(!blockYZ && !blockXZ)
+      { //YZ-plane, XZ-plane
+          //std::cout<<"YZ-plane, XZ-plane, plane="<<plane<<std::endl;
+          double b2 = -myYZalgo.getNormal()[1];//Integer b2 = myYZalgo.b();
+          double c2 = myYZalgo.getNormal()[0];//Integer c2 = myYZalgo.a();
+          double a2 = -myXZalgo.getNormal()[1];//Integer a2 = myXZalgo.b();
+          double c1 = myXZalgo.getNormal()[0];//Integer c1 = myXZalgo.a();
+          //std::cout<<"b2="<<b2<<", c2="<<c2<<", a2="<<a2<<", c1="<<c1<<std::endl;
+          if (/* a2 == 0 || */ ( c2 == 0 && c1 == 0 ) ) {
+            direction = PointD3d ( a2, b2, c2 );
+            double mu1 = myYZalgo.getMu();//Integer mu1 = myYZalgo.mu();
+            double mu2 = myXZalgo.getMu();//Integer mu2 = myXZalgo.mu();
+            intercept[0] = mu2; intercept[1] = mu1; intercept[2] = 0;
+            double omega1 = std::max(minimalThickness,myYZalgo.getNu());//Integer omega1 = myYZalgo.omega()-1;
+            double omega2 = std::max(minimalThickness,myXZalgo.getNu());//Integer omega2 = myXZalgo.omega()-1;
+            thickness[0] = omega2; thickness[1] = omega1; thickness[2] = 0;
+          }
+          else
+          {
+            if ( b2 == 0 )
+              direction = PointD3d ( a2, b2, c1 );
+            else
+              direction = PointD3d ( c2 * a2, c1 * b2, c1 * c2 );
+
+            double mu1 = myYZalgo.getMu();//Integer mu1 = myYZalgo.mu();
+            double mu2 = myXZalgo.getMu();//Integer mu2 = myXZalgo.mu();
+            intercept[0] = mu2/c1; intercept[1] = mu1/c2; intercept[2] = 0;//intercept[0] = std::make_pair ( mu2, c1 ); intercept[1] = std::make_pair ( mu1, c2 ); intercept[2] = std::make_pair ( 0, 1 );
+
+            double omega1 = std::max(minimalThickness,myYZalgo.getNu());//Integer omega1 = myYZalgo.omega()-1;
+            double omega2 = std::max(minimalThickness,myXZalgo.getNu());//Integer omega2 = myXZalgo.omega()-1;
+            thickness[0] = omega2/c1; thickness[1] = omega1/c2; thickness[2] = 0;//thickness[0] = std::make_pair ( omega2, c1 ); thickness[1] = std::make_pair ( omega1, c2 ); thickness[2] = std::make_pair ( 0, 1);
+            //std::cout<<"mu1="<<mu1<<", mu2="<<mu2<<", omega1="<<omega1<<", omega2="<<omega2<<std::endl;
+            //std::cout<<"direction="<<direction<<", intercept="<<intercept<<", thickness="<<thickness<<std::endl;
+          }
+      }
+      else {//degenerated case
+        if(p0!=0) {
+          //std::cout<<"Degenerated case : p0"<<std::endl;
+          direction = PointD3d ( 1, 0, 0 );
+          double mu1 = std::min((*myYZalgo.begin())[0], (*(myYZalgo.end()-1))[0]);//Integer mu1 = myXYalgo.mu();
+          double mu2 = std::min((*myYZalgo.begin())[1], (*(myYZalgo.end()-1))[1]);//Integer mu2 = myXZalgo.mu();
+          intercept[0] = 0; intercept[1] = mu1; intercept[2] = mu2;
+          double omega1 = std::max(minimalThickness,myXYalgo.getNu());//Integer omega1 = myXYalgo.omega()-1;
+          double omega2 = std::max(minimalThickness,myXZalgo.getNu());//Integer omega2 = myXZalgo.omega()-1;
+          thickness[0] = 0; thickness[1] = omega1; thickness[2] = omega2;
+          //std::cout<<"mu1="<<mu1<<", mu2="<<mu2<<", omega1="<<omega1<<", omega2="<<omega2<<std::endl;
+          //std::cout<<"direction="<<direction<<", intercept="<<intercept<<", thickness="<<thickness<<std::endl;
+        }
+        else {
+            if(p1!=0) {
+            //std::cout<<"Degenerated case : p1"<<std::endl;
+            direction = PointD3d ( 0, 1, 0 );
+            double mu1 = std::min((*myXZalgo.begin())[0], (*(myXZalgo.end()-1))[0]);//myXYalgo.getMu();//Integer mu1 = myXYalgo.mu();
+            double mu2 = std::min((*myXZalgo.begin())[1], (*(myXZalgo.end()-1))[1]);//myYZalgo.getMu();//Integer mu2 = myYZalgo.mu();
+            intercept[0] = mu1; intercept[1] = 0; intercept[2] = mu2;
+            double omega1 = std::max(minimalThickness,myXYalgo.getNu());//Integer omega1 = myXYalgo.omega()-1;
+            double omega2 = std::max(minimalThickness,myYZalgo.getNu());//Integer omega2 = myYZalgo.omega()-1;
+            thickness[0] = omega1; thickness[1] = 0; thickness[2] = omega2;
+            //std::cout<<"mu1="<<mu1<<", mu2="<<mu2<<", omega1="<<omega1<<", omega2="<<omega2<<std::endl;
+            //std::cout<<"direction="<<direction<<", intercept="<<intercept<<", thickness="<<thickness<<std::endl;
+          }
+          else {
+            if(p2!=0) {
+              //std::cout<<"Degenerated case : p2"<<std::endl;
+              direction = PointD3d ( 0, 0, 1 );
+              double mu1 = std::min((*myXYalgo.begin())[0], (*(myXYalgo.end()-1))[0]);//myYZalgo.getMu();//Integer mu1 = myYZalgo.mu();
+              double mu2 = std::min((*myXYalgo.begin())[1], (*(myXYalgo.end()-1))[1]);//myXZalgo.getMu();//Integer mu2 = myXZalgo.mu();
+              intercept[0] = mu1; intercept[1] = mu2 ; intercept[2] = 0;
+              double omega1 = std::max(minimalThickness,myYZalgo.getNu());//Integer omega1 = myYZalgo.omega()-1;
+              double omega2 = std::max(minimalThickness,myXZalgo.getNu());//Integer omega2 = myXZalgo.omega()-1;
+              thickness[0] = omega1; thickness[1] = omega2; thickness[2] = 0;
+              //std::cout<<"mu1="<<mu1<<", mu2="<<mu2<<", omega1="<<omega1<<", omega2="<<omega2<<std::endl;
+              //std::cout<<"direction="<<direction<<", intercept="<<intercept<<", thickness="<<thickness<<std::endl;
+            }
+            else {
+              std::cout<<"Degenerated case"<<std::endl;
+              direction = Point3d(0,0,0);
+              intercept[0] = 0; intercept[1] = 0; intercept[2] = 0;//intercept[0] = std::make_pair ( 0, 1 ); intercept[1] = std::make_pair ( 0, 1 ); intercept[2] = std::make_pair ( 0, 1 );
+              thickness[0] = 0; thickness[1] = 0; thickness[2] = 0;//thickness[0] = std::make_pair ( 0, 1 ); thickness[1] = std::make_pair ( 0, 1 ); thickness[2] = std::make_pair ( 0, 1);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------
+template <typename TIterator, typename TInteger>
+inline
+const typename DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::AlphaThickSegmentComputer2d &
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::alphaThickSeg2dXY() const
+{
+  return myXYalgo;
+}
+//-----------------------------------------------------------------------------
+template <typename TIterator, typename TInteger>
+inline
+const typename DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::AlphaThickSegmentComputer2d &
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::alphaThickSeg2dXZ() const
+{
+  return myXZalgo;
+}
+//-----------------------------------------------------------------------------
+template <typename TIterator, typename TInteger>
+inline
+const typename DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::AlphaThickSegmentComputer2d &
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::alphaThickSeg2dYZ() const
+{
+  return myYZalgo;
+}
+//-----------------------------------------------------------------------------
+template <typename TIterator, typename TInteger>
+inline
+const typename DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::AlphaThickSegmentComputer2d &
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::alphaThickSeg2d( Dimension i ) const
+{
+  ASSERT( i < 3 );
+  switch ( i ) {
+  case 0: return myYZalgo; break;
+  case 1: return myXZalgo; break;
+  default: return myXYalgo; break;
+  }
+}
+
+template <typename TIterator, typename TInteger>
+inline
+bool
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::validalphaThickSeg2d( Dimension i ) const
+{
+  ASSERT( i < 3 );
+  unsigned int lenXY = myLengthXY; //std::distance ( myXYalgo.begin(), myXYalgo.end() );
+  unsigned int lenXZ = myLengthXZ; //std::distance ( myXZalgo.begin(), myXZalgo.end() );
+  unsigned int lenYZ = myLengthYZ; // std::distance ( myYZalgo.begin(), myYZalgo.end() );
+  if ( i == 0 && ( lenYZ >= lenXZ || lenYZ >= lenXY ) )
+    return true;
+  else if ( i == 1 && ( lenXZ >= lenXY || lenXZ >= lenYZ ) )
+    return true;
+  else if ( i == 2 && ( lenXY >= lenXZ || lenXY >= lenYZ ) )
+  return true;
+  return false;
+}
+
+/**
+ * @return the style name used for drawing this object.
+ */
+template <typename TIterator, typename TInteger>
+inline
+std::string
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::className() const
+{
+  return "AlphaThickSeg3DComputer";//AlphaThickSeg3DComputer Naive3DDSSComputer StandardDSS6Computer
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Implementation of inline functions and external operators                 //
+
+//------------------------------------------------------------------------------
+//   TEXT DISPLAY
+
+/**
+ * Writes/Displays the object on an output stream.
+ * @param out the output stream where the object is written.
+ */
+template <typename TIterator, typename TInteger>
+inline
+void
+DGtal::AlphaThickSeg3DComputer<TIterator,TInteger>::selfDisplay ( std::ostream & out) const
+{
+  out << "[AlphaThickSeg3DComputer] " << " [XYprojection] " << myXYalgo << " [XZprojection] ";
+  out << myXZalgo << " [YZprojection] " << myYZalgo << " [End AlphaThickSeg3DComputer]" <<  std::endl;
+  out << "[AlphaThickSeg3DComputer]" <<  std::endl;
+}
+//                                                                           //
+///////////////////////////////////////////////////////////////////////////////
+
+
