@@ -3,6 +3,11 @@ Source code of DGMM Paper: Tangential cover for 3D irregular noisy digital curve
 
 ## Compilation
 
+1. Build meaningful thickness noise detector
+
+2. Build 3D adaptive tangential cover 
+
+
 cd Sources
 
 mkdir build
