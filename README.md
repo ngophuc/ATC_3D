@@ -25,7 +25,7 @@ Tangential cover for 3D irregular noisy digital curves.
 
 Example:
 
- 	 ATC3D --input <FileName> --imaGeneDir <imaGeneDir> 
+ 	 ATC3D --input <FileName> --mt <MeaningfulThicknessDir> 
 
 Usage: ./ATC3D [OPTIONS] 1
 
