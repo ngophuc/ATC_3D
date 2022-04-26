@@ -6,8 +6,10 @@
 #endif
 
 #include "helpers/GeomHelpers.h"
-//#include "helpers/MThelpers.h"
-#include "maximalblurredsegment3D.h"
+#include "helpers/maximalblurredsegment3D.h"
+#include "helpers/GeomHelpers.h"
+
+#include "CLI11.hpp"
 
 /* Build TC 3D with a given thickness */
 vector<MaximalBlurredSegment3D> buildTC(std::vector<Z3i::Point>& aContour,
@@ -20,7 +22,6 @@ vector<MaximalBlurredSegment3D> buildTC(std::vector<Z3i::Point>& aContour,
   int it=0;
   int idS, idE;
   for (Iterator i = aContour.begin() ; i != e && idE+1!= aContour.size(); ++i) {
-    //for (Iterator i = aContour.begin() ; it==0; ++i) {
     AlphaThickSegmentComputer3D seg(thickness, 3); //2 or 3 valid planes
     seg.init(i); 
     idS = it;
@@ -32,13 +33,11 @@ vector<MaximalBlurredSegment3D> buildTC(std::vector<Z3i::Point>& aContour,
       okXZ = isInConvexPolygon(aContourXZ.at(idE), seg.alphaThickSeg2dXZ().getConvexHull());
       isOk = okXY && okYZ && okXZ;
       if(isOk) {
-        //std::cout<<"Call extendFront"<<std::endl;
         seg.extendFront();
         idE++;
-        //std::cout<<"End Call extendFront : ("<<idS<<"-"<<idE<<")"<<std::endl;
       }
     }
-    std::cout<<"End extendFront : ("<<idS<<"-"<<idE<<")"<<std::endl;
+    //std::cout<<"End extendFront : ("<<idS<<"-"<<idE<<")"<<std::endl;
     if(it==0){
       MaximalBlurredSegment3D bs(idS, idE, thickness, seg);
       TC.push_back(bs);
@@ -114,7 +113,7 @@ std::vector<MaximalBlurredSegment3D> buildATC(std::vector<Z3i::Point>& aContour,
   std::vector<std::vector<MaximalBlurredSegment3D> > meaningThicknessTangentCover(meaningThicknessElement.size());
   int index=0;
   for(vector<double>::const_iterator it=meaningThicknessElement.begin(); it!=meaningThicknessElement.end(); it++) {
-    double thickness=(*it)*sqrt(2);//(*it);//
+    double thickness=(*it);//*sqrt(2);
     vector<Z2i::Point> aContourXY, aContourXZ, aContourYZ;
     bool validOxy=false,validOxz=false,validOyz=false;
     projectionPoints3D(aContour,aContourXY,aContourXZ,aContourYZ,validOxy,validOxz,validOyz);
@@ -130,8 +129,7 @@ std::vector<MaximalBlurredSegment3D> buildATC(std::vector<Z3i::Point>& aContour,
   for(vector<double>::const_iterator it=vecMT.begin(); it!=vecMT.end(); it++)
     vecMTmodified.push_back(*it);
   for(int it=(int)meaningThicknessTangentCover.size()-1; it>=0; it--) {
-    //for(int it=0; it<(int)meaningThicknessTangentCover.size();it++) {
-    vector<MaximalBlurredSegment3D> fuzzySegmentSet=meaningThicknessTangentCover.at(it);//*it;
+    vector<MaximalBlurredSegment3D> fuzzySegmentSet=meaningThicknessTangentCover.at(it);
     double thickness=meaningThicknessElement.at(it);
     for(vector<MaximalBlurredSegment3D>::const_iterator it_bis=fuzzySegmentSet.begin();it_bis!=fuzzySegmentSet.end();it_bis++) {
       int idStart=(*it_bis).getIdBegin();
@@ -139,7 +137,7 @@ std::vector<MaximalBlurredSegment3D> buildATC(std::vector<Z3i::Point>& aContour,
       if(idStart!=-1 && idEnd!=-1) {
         double maxThickness=maxThicknessSegment(*it_bis, vecMT);
         for(int i=idStart; i<=idEnd; i++) { //FIXME : idStart+1 => justify !!!
-          if(maxThickness==thickness)//vecMTmodified.at(i)<maxThickness &&
+          if(maxThickness==thickness)
             vecMTmodified.at(i%aContour.size())=maxThickness;
         }
       }
@@ -242,7 +240,6 @@ std::vector<MaximalBlurredSegment3D> buildATC(std::vector<Z3i::Point>& aContour,
             idMinStart=idCurrentStart;
             idMinEnd=idCurrentEnd;
           }
-          //if(idMinStart>=idCurrentStart && idMinEnd>=idCurrentEnd)
           else if(idMinStart>idCurrentStart && idMinEnd>=idCurrentEnd) {
             idSeg=idCurrentSeg;
             idMin=it;
@@ -318,7 +315,6 @@ vector<MaximalBlurredSegment3D> buildModifiedATC(vector<Z3i::Point>& aContour,
   for(vector<double>::const_iterator it=vecMT.begin(); it!=vecMT.end(); it++)
     vecMTmodified.push_back(*it);
   for(int it=(int)meaningThicknessTangentCover.size()-1; it>=0; it--) {
-    //for(int it=0; it<(int)meaningThicknessTangentCover.size();it++) {
     vector<MaximalBlurredSegment3D> fuzzySegmentSet=meaningThicknessTangentCover.at(it);//*it;
     double thickness=meaningThicknessElement.at(it);
     for(vector<MaximalBlurredSegment3D>::const_iterator it_bis=fuzzySegmentSet.begin();it_bis!=fuzzySegmentSet.end();it_bis++) {
@@ -326,8 +322,8 @@ vector<MaximalBlurredSegment3D> buildModifiedATC(vector<Z3i::Point>& aContour,
       int idEnd=(*it_bis).getIdEnd();
       if(idStart!=-1 && idEnd!=-1) {
         double maxThickness=statThicknessSegment(*it_bis, vecMT);
-        for(int i=idStart; i<=idEnd; i++) {//FIXME : idStart+1 => justify !!!
-          if(maxThickness==thickness)//vecMTmodified.at(i)<maxThickness &&
+        for(int i=idStart; i<=idEnd; i++) {
+          if(maxThickness==thickness)
             vecMTmodified.at(i%aContour.size())=maxThickness;
         }
       }
@@ -431,7 +427,6 @@ vector<MaximalBlurredSegment3D> buildModifiedATC(vector<Z3i::Point>& aContour,
             idMinStart=idCurrentStart;
             idMinEnd=idCurrentEnd;
           }
-          //if(idMinStart>=idCurrentStart && idMinEnd>=idCurrentEnd)
           else if(idMinStart>idCurrentStart && idMinEnd>=idCurrentEnd) {
             idSeg=idCurrentSeg;
             idMin=it;
@@ -451,33 +446,21 @@ vector<MaximalBlurredSegment3D> buildModifiedATC(vector<Z3i::Point>& aContour,
 
 int main(int argc, char** argv)
 {
+  // parse command line using CLI ----------------------------------------------
+  CLI::App app;
+  std::string inputFile = "../data/sinus_noise.dat";
+  string mtDir = "../MeaningfulThickness/";
+  
+  app.description("Tangential cover for 3D irregular noisy digital curves.\n Example:\n \t ATC3D --input <FileName> --imaGeneDir <imaGeneDir> \n");
+  app.add_option("-i,--input,1",inputFile,"Input file.")->required()->check(CLI::ExistingFile);
+  app.add_option("-m,--mt",mtDir,"MeaningfulThickness directory for noise detection (default ../MeaningfulThickness/).");
+  
+  app.get_formatter()->column_width(40);
+  CLI11_PARSE(app, argc, argv);
+  // END parse command line using CLI ----------------------------------------------
+  
   QApplication application(argc,argv);
-  char fileContour[] = "../data/sinus_noise.dat";
-  vector<Z3i::Point> aContour = PointListReader<Z3i::Point>::getPointsFromFile(fileContour);
-  /*
-  //Gen noise and move points
-  std::random_device rd;  // Will be used to obtain a seed for the random number engine
-  std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
-  std::uniform_real_distribution<double> dis(0.0, 1.0);
-  for (size_t i=0; i< aContour.size(); i++) {
-    double p = dis(gen);
-    if(p<0.125)
-      aContour.at(i) = aContour.at(i)+Z3i::Point(0,0,1);
-    else if(p<0.25)
-      aContour.at(i) = aContour.at(i)+Z3i::Point(0,0,-1);
-    else if(p<0.375)
-      aContour.at(i) = aContour.at(i)+Z3i::Point(0,1,0);
-    else if(p<0.5)
-      aContour.at(i) = aContour.at(i)+Z3i::Point(0,-1,0);
-    else if(p<0.675)
-      aContour.at(i) = aContour.at(i)+Z3i::Point(1,0,0);
-    else if(p<0.75)
-      aContour.at(i) = aContour.at(i)+Z3i::Point(-1,0,0);
-  }
-  string fileContourNoise = fileContour;
-  fileContourNoise = fileContourNoise.substr(0,fileContourNoise.size()-4)+"_noise.dat";
-  writePointList(aContour,fileContourNoise.c_str());
-  */
+  vector<Z3i::Point> aContour = PointListReader<Z3i::Point>::getPointsFromFile(inputFile.c_str());
   
   //Project into 2D planes
   vector<Z2i::Point> aContourXY, aContourXZ, aContourYZ;
@@ -485,9 +468,9 @@ int main(int argc, char** argv)
   bool bijective=projectionPoints3D(aContour,aContourXY,aContourXZ,aContourYZ,validOxy,validOxz,validOyz);
   
   vector<double> vecMTXYtmp, vecMTXZtmp, vecMTYZtmp, vecMT;
-  vecMTXYtmp=vector<double>(aContourXY.size(),3.0);//getMeaningfulThickness(aContourXY,10,1);//
-  vecMTXZtmp=vector<double>(aContourXZ.size(),3.0);//getMeaningfulThickness(aContourXZ,10,1);//
-  vecMTYZtmp=vector<double>(aContourYZ.size(),3.0);//getMeaningfulThickness(aContourYZ,10,1);//
+  vecMTXYtmp=getMeaningfulThickness(mtDir,aContourXY,10,1);
+  vecMTXZtmp=getMeaningfulThickness(mtDir,aContourXZ,10,1);
+  vecMTYZtmp=getMeaningfulThickness(mtDir,aContourYZ,10,1);
   vecMT=getThicknessAssociation(vecMTXYtmp, vecMTXZtmp, vecMTYZtmp, &mid_functor);
   
   //Step 1: get all different noise-levels then sort them
@@ -520,7 +503,7 @@ int main(int argc, char** argv)
   //show 3D points
   for (size_t i =0; i< aContour.size(); i++) {
     Z3i::Point p (aContour[i][0],aContour[i][1], aContour[i][2]);
-    viewer << SetMode3D( p.className(), "Grid" );//Both
+    viewer << SetMode3D( p.className(), "Grid" );
     viewer << p;
   }
   viewer << CustomColors3D(Color(250,0,0,100),Color(250,0,0,100));
@@ -564,7 +547,7 @@ int main(int argc, char** argv)
   }
   
   // Draw ATC 3D
-  viewer << SetMode3D(segATC.front().className(), "BoundingBox");//"AlphaThickSeg3DComputer"
+  viewer << SetMode3D(segATC.front().className(), "BoundingBox");
   for(size_t it=0; it<segATC.size(); it++) {
     switch (color.at(it)) {
       case 1:

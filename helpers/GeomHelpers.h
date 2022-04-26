@@ -49,7 +49,7 @@ bool projectionPoints3D(const vector<Z3i::Point>& aContour, vector<Z2i::Point>& 
 bool projectionPoints3D(const vector<Z3i::Point>& aContour, vector<Z2i::Point>& pointOxy, vector<Z2i::Point>& pointOxz, vector<Z2i::Point>& pointOyz, bool& validOxy, bool& validOxz, bool& validOyz);
 void projectionPoints3D(const vector<Z3i::Point>& aContour, vector<Z2i::Point>& pointOxy, vector<Z2i::Point>& pointOxz, vector<Z2i::Point>& pointOyz);
 
-vector<double> getMeaningfulThickness(const vector<Z2i::Point> aContour, double maxMT=10, double stepMT=1);
+vector<double> getMeaningfulThickness(const string ImaGeneDir, const vector<Z2i::Point> aContour, double maxMT=10, double stepMT=1);
 vector<double> sortMeaningfulThickness(const vector<double> vecMT);
 vector<double> labelMeaningfulThickness(const vector<Z2i::Point>& aContour, const vector<double>& vecMT);
 

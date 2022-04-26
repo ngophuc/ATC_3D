@@ -7,6 +7,7 @@ SET(SOURCE_BASE_HEADER_FILES
   #${PROJECT_SOURCE_DIR}/helpers/MThelpers.h
   ${PROJECT_SOURCE_DIR}/helpers/maximalblurredsegment3D.h
   ${PROJECT_SOURCE_DIR}/helpers/maximalblurredsegment.h
+  ${PROJECT_SOURCE_DIR}/helpers/CLI11.hpp
 )
 
 SET(SOURCE_BASE_FILES

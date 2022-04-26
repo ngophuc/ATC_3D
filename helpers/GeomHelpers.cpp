@@ -258,16 +258,15 @@ void writeFile(const vector<Z2i::Point>& v, const char* filename)
   else cout << "Unable to open file " <<filename;
 }
 
-vector<double> getMeaningfulThickness(const vector<Z2i::Point> aContour, double maxMT, double stepMT)
+vector<double> getMeaningfulThickness(const string mtDir, const vector<Z2i::Point> aContour, double maxMT, double stepMT)
 {
   cout<<"getMeaningfulThickness"<<endl;
-  string contourFile,noiseLevelMTFile,ImaGeneDIR;
-  ImaGeneDIR ="../";
+  string contourFile,noiseLevelMTFile;
   noiseLevelMTFile="MeanThickness.txt";
   contourFile="Contour.txt";
   writeFile(aContour,contourFile.c_str());
   std::stringstream instruction;
-  instruction << ImaGeneDIR << "MeaningfulThickness"
+  instruction << mtDir << "/build/MeaningfulThickness"
   << " -srcPolygon " << contourFile
   << " 0 1 -setSampling "<<maxMT<<" "<<stepMT
   << " -exportNoiseLevel "<< noiseLevelMTFile;
