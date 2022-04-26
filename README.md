@@ -14,8 +14,9 @@ cmake .. -DDGtal_DIR=DGTAL_DIR [-DCMAKE_BUILD_TYPE=Release / Debug]
 make -j4
 
 ## Execution
-./ATC3D -i ../Samples/ball.pgm --a11 1.5 --a12 0.2 --a21 0.5 --a22 1.2
+./ATC3D -i ../data/sinus_noise.dat -m ../MeaningfulThickness/
 
+./ATC3D -i ../data/vasque_noise.dat -m ../MeaningfulThickness/
 
 ## Help
 ./ATC3D -h
