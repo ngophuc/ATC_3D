@@ -24,6 +24,7 @@ make -j4
 Tangential cover for 3D irregular noisy digital curves.
 
 Example:
+
  	 ATC3D --input <FileName> --imaGeneDir <imaGeneDir> 
 
 Usage: ./ATC3D [OPTIONS] 1
@@ -32,7 +33,10 @@ Positionals:
   1 TEXT:FILE REQUIRED                  Input file.
 
 Options:
+
   -h,--help                             Print this help message and exit
+  
   -i,--input TEXT:FILE REQUIRED         Input file.
+  
   -m,--mt TEXT                          MeaningfulThickness directory for noise detection (default ../MeaningfulThickness/).
  
