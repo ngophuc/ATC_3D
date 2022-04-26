@@ -451,7 +451,7 @@ int main(int argc, char** argv)
   std::string inputFile = "../data/sinus_noise.dat";
   string mtDir = "../MeaningfulThickness/";
   
-  app.description("Tangential cover for 3D irregular noisy digital curves.\n Example:\n \t ATC3D --input <FileName> --imaGeneDir <imaGeneDir> \n");
+  app.description("Tangential cover for 3D irregular noisy digital curves.\n Example:\n \t ATC3D --input <FileName> --mt <MeaningfulThicknessDir> \n");
   app.add_option("-i,--input,1",inputFile,"Input file.")->required()->check(CLI::ExistingFile);
   app.add_option("-m,--mt",mtDir,"MeaningfulThickness directory for noise detection (default ../MeaningfulThickness/).");
   
