@@ -1,4 +1,5 @@
-# Source code of DGMM Paper: Tangential cover for 3D irregular noisy digital curves
+Source code of DGMM Paper: 
+# Tangential cover for 3D irregular noisy digital curves
 
 ## Compilation
 
