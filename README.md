@@ -22,7 +22,7 @@ Source code of DGMM Paper:
 
    ``./ATC3D -i ../data/vasque_noise.dat -m ../MeaningfulThickness/``
    
-   ``./ATC3D -i ../data/Astroid_noise.dat -m ../MeaningfulThickness/``
+   ``./ATC3D -i ../data/astroid_noise.dat -m ../MeaningfulThickness/``
 
 <table cellpadding="3">
 		<tr>
@@ -45,7 +45,7 @@ Source code of DGMM Paper:
 				<img height="300" src="https://github.com/ngophuc/ATC_3D/blob/main/data/Astroid_ATC3D.png" alt="Astroid_ATC3D" />
 			</a>
 		<br />
-		vasque_noise.dat
+		astroid_noise.dat
 		</td>			
 		</tr>
 	</table>
