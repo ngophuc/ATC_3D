@@ -5,15 +5,15 @@ Source code of DGMM Paper:
 
 1. Build meaningful thickness noise detector
 
- 	 ``cd [SourcesDirectory]/MeaningfulThickness; mkdir build; cd build``
+ 	 ``cd <SourcesDirectory>/MeaningfulThickness; mkdir build; cd build``
 
  	 ``cmake ..; make -j4``
 
 2. Build 3D adaptive tangential cover 
 
-   ``cd [SourcesDirectory]; mkdir build; cd build``
+   ``cd <SourcesDirectory>; mkdir build; cd build``
 
- 	 ``cmake .. -DDGtal_DIR=DGTAL_DIR [-DCMAKE_BUILD_TYPE=Release / Debug]``
+ 	 ``cmake .. -DDGtal_DIR=<DGTAL_DIR> [-DCMAKE_BUILD_TYPE=Release / Debug]``
   
    ``make -j4``
 
@@ -22,6 +22,32 @@ Source code of DGMM Paper:
 
    ``./ATC3D -i ../data/vasque_noise.dat -m ../MeaningfulThickness/``
 
+<table cellpadding="3">
+		<tr>
+		<td align="center" valign="center">
+			<a href="https://github.com/ngophuc/ATC_3D/data/bird5.png">
+				<img width="300" src="https://github.com/ngophuc/ModifiedAdaptiveTagentialCover/blob/master/Samples/bird5.png" alt="Input image" />
+			</a>	
+		<br />
+		sinus_noise.dat
+		</td>
+		<td align="center" valign="center">
+			<a href="https://github.com/ngophuc/ModifiedAdaptiveTagentialCover/blob/master/Results/bird5_ATC.pdf">
+				<img width="300" src="https://github.com/ngophuc/ModifiedAdaptiveTagentialCover/blob/master/Results/bird5_ATC.png" alt="Adaptive Tagential Cover result" />
+			</a>
+		<br />
+		vasque_noise.dat
+		</td>	
+		<td align="center" valign="center">
+			<a href="https://github.com/ngophuc/ModifiedAdaptiveTagentialCover/blob/master/Results/bird5_DPnew_ATC.pdf">
+				<img width="300" src="https://github.com/ngophuc/ModifiedAdaptiveTagentialCover/blob/master/Results/bird5_DPnew_ATC.png" alt="Polygonal approximation with ATC" />
+			</a>
+		<br />
+		vasque_noise.dat
+		</td>			
+		</tr>
+	</table>
+ 
 ## Help
 ``./ATC3D -h``
 
