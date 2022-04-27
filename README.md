@@ -28,21 +28,21 @@ Source code of DGMM Paper:
 		<tr>
 		<td align="center" valign="center">
 			<a href="https://github.com/ngophuc/ATC_3D/blob/main/data/Sinus_ATC3D.png">
-				<img height="300" src="https://github.com/ngophuc/ATC_3D/blob/main/data/Sinus_ATC3D.png" alt="sinus_noise" />
+				<img height="250" width="450" src="https://github.com/ngophuc/ATC_3D/blob/main/data/Sinus_ATC3D.png" alt="sinus_noise" />
 			</a>	
 		<br />
 		sinus_noise.dat
 		</td>
 		<td align="center" valign="center">
 			<a href="https://github.com/ngophuc/ATC_3D/blob/main/data/Vasque_ATC3D.png">
-				<img height="300" src="https://github.com/ngophuc/ATC_3D/blob/main/data/Vasque_ATC3D.png" alt="vasque_noise" />
+				<img height="250" width="300" src="https://github.com/ngophuc/ATC_3D/blob/main/data/Vasque_ATC3D.png" alt="vasque_noise" />
 			</a>
 		<br />
 		vasque_noise.dat
 		</td>	
 		<td align="center" valign="center">
 			<a href="https://github.com/ngophuc/ATC_3D/blob/main/data/Astroid_ATC3D.png">
-				<img height="300" src="https://github.com/ngophuc/ATC_3D/blob/main/data/Astroid_ATC3D.png" alt="Astroid_ATC3D" />
+				<img height="250" width="300" src="https://github.com/ngophuc/ATC_3D/blob/main/data/Astroid_ATC3D.png" alt="Astroid_ATC3D" />
 			</a>
 		<br />
 		astroid_noise.dat
