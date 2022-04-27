@@ -21,6 +21,8 @@ Source code of DGMM Paper:
    ``./ATC3D -i ../data/sinus_noise.dat -m ../MeaningfulThickness/``
 
    ``./ATC3D -i ../data/vasque_noise.dat -m ../MeaningfulThickness/``
+   
+   ``./ATC3D -i ../data/Astroid_noise.dat -m ../MeaningfulThickness/``
 
 <table cellpadding="3">
 		<tr>
