@@ -3,6 +3,7 @@ Source code of DGMM Paper:
 
 ## Compilation
 
+0. Dependancy: <a href="https://dgtal.org/">DGtal Library</a>
 1. Build meaningful thickness noise detector
 
  	 ``cd <SourcesDirectory>/MeaningfulThickness; mkdir build; cd build``
