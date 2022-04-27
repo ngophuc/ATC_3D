@@ -25,22 +25,22 @@ Source code of DGMM Paper:
 <table cellpadding="3">
 		<tr>
 		<td align="center" valign="center">
-			<a href="https://github.com/ngophuc/ATC_3D/data/bird5.png">
-				<img width="300" src="https://github.com/ngophuc/ModifiedAdaptiveTagentialCover/blob/master/Samples/bird5.png" alt="Input image" />
+			<a href="https://github.com/ngophuc/ATC_3D/blob/main/data/Sinus_ATC3D.png">
+				<img height="300" src="https://github.com/ngophuc/ATC_3D/blob/main/data/Sinus_ATC3D.png" alt="sinus_noise" />
 			</a>	
 		<br />
 		sinus_noise.dat
 		</td>
 		<td align="center" valign="center">
-			<a href="https://github.com/ngophuc/ModifiedAdaptiveTagentialCover/blob/master/Results/bird5_ATC.pdf">
-				<img width="300" src="https://github.com/ngophuc/ModifiedAdaptiveTagentialCover/blob/master/Results/bird5_ATC.png" alt="Adaptive Tagential Cover result" />
+			<a href="https://github.com/ngophuc/ATC_3D/blob/main/data/Vasque_ATC3D.png">
+				<img height="300" src="https://github.com/ngophuc/ATC_3D/blob/main/data/Vasque_ATC3D.png" alt="vasque_noise" />
 			</a>
 		<br />
 		vasque_noise.dat
 		</td>	
 		<td align="center" valign="center">
-			<a href="https://github.com/ngophuc/ModifiedAdaptiveTagentialCover/blob/master/Results/bird5_DPnew_ATC.pdf">
-				<img width="300" src="https://github.com/ngophuc/ModifiedAdaptiveTagentialCover/blob/master/Results/bird5_DPnew_ATC.png" alt="Polygonal approximation with ATC" />
+			<a href="https://github.com/ngophuc/ATC_3D/blob/main/data/Astroid_ATC3D.png">
+				<img height="300" src="https://github.com/ngophuc/ATC_3D/blob/main/data/Astroid_ATC3D.png" alt="Astroid_ATC3D" />
 			</a>
 		<br />
 		vasque_noise.dat
